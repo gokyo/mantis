@@ -1,4 +1,6 @@
-enablePlugins(JDKPackagerPlugin, JavaAppPackaging, SolidityPlugin)
+enablePlugins(JDKPackagerPlugin, JavaAppPackaging, SolidityPlugin, JavaAgent)
+
+javaAgents += "io.kamon" % "kanela-agent" % "1.0.6"
 
 import scala.sys.process.Process
 import NativePackagerHelper._
@@ -14,7 +16,7 @@ def commonSettings(projectName: String): Seq[sbt.Def.Setting[_]] = Seq(
   name := projectName,
   organization := "io.iohk",
   version := "3.2.1",
-  scalaVersion := "2.12.12",
+  scalaVersion := "2.13.4",
   // Scalanet snapshots are published to Sonatype after each build.
   resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
   testOptions in Test += Tests
@@ -24,10 +26,6 @@ def commonSettings(projectName: String): Seq[sbt.Def.Setting[_]] = Seq(
     "-deprecation",
     "-feature",
     "-Xfatal-warnings",
-    "-Xlint:unsound-match",
-    "-Ywarn-inaccessible",
-    "-Ywarn-unused-import",
-    "-Ypartial-unification",
     "-encoding",
     "utf-8"
   ),
@@ -127,6 +125,7 @@ lazy val node = {
       Dependencies.logging,
       Dependencies.apacheCommons,
       Dependencies.micrometer,
+      Dependencies.kamon,
       Dependencies.prometheus,
       Dependencies.cli,
       Dependencies.dependencies
@@ -207,7 +206,9 @@ lazy val node = {
   if (!nixBuild)
     node
   else
+    //node.settings(PB.protocExecutable := file("protoc"))
     node.settings(PB.runProtoc in Compile := (args => Process("protoc", args) !))
+
 }
 
 coverageExcludedPackages := "io\\.iohk\\.ethereum\\.extvm\\.msg.*"
