@@ -84,14 +84,22 @@ class JsonRpcControllerFixture(implicit system: ActorSystem)
     keyStore,
     pendingTransactionsManager.ref,
     syncingController.ref,
-    ommersPool.ref,
     filterManager.ref,
     filterConfig,
     blockchainConfig,
     currentProtocolVersion,
-    config,
     getTransactionFromPoolTimeout,
     Timeouts.shortTimeout
+  )
+
+  val miningService = new EthMiningService(
+    blockchain,
+    ledger,
+    config,
+    ommersPool.ref,
+    syncingController.ref,
+    pendingTransactionsManager.ref,
+    getTransactionFromPoolTimeout
   )
 
   protected def newJsonRpcController(ethService: EthService) =
@@ -105,6 +113,7 @@ class JsonRpcControllerFixture(implicit system: ActorSystem)
       qaService,
       checkpointingService,
       mantisService,
+      miningService,
       config
     )
 

@@ -4,6 +4,7 @@ import io.iohk.ethereum.jsonrpc.CheckpointingService._
 import io.iohk.ethereum.jsonrpc.DebugService.{ListPeersInfoRequest, ListPeersInfoResponse}
 import io.iohk.ethereum.jsonrpc.EthService._
 import io.iohk.ethereum.jsonrpc.MantisService.{GetAccountTransactionsRequest, GetAccountTransactionsResponse}
+import io.iohk.ethereum.jsonrpc.EthMiningService._
 import io.iohk.ethereum.jsonrpc.NetService._
 import io.iohk.ethereum.jsonrpc.PersonalService._
 import io.iohk.ethereum.jsonrpc.QAService.{
@@ -31,6 +32,7 @@ class JsonRpcController(
     qaService: QAService,
     checkpointingService: CheckpointingService,
     mantisService: MantisService,
+    miningService: EthMiningService,
     override val config: JsonRpcConfig
 ) extends ApisBuilder
     with Logger
@@ -87,9 +89,9 @@ class JsonRpcController(
     case req @ JsonRpcRequest(_, "eth_syncing", _, _) =>
       handle[SyncingRequest, SyncingResponse](ethService.syncing, req)
     case req @ JsonRpcRequest(_, "eth_submitHashrate", _, _) =>
-      handle[SubmitHashRateRequest, SubmitHashRateResponse](ethService.submitHashRate, req)
+      handle[SubmitHashRateRequest, SubmitHashRateResponse](miningService.submitHashRate, req)
     case req @ JsonRpcRequest(_, "eth_hashrate", _, _) =>
-      handle[GetHashRateRequest, GetHashRateResponse](ethService.getHashRate, req)
+      handle[GetHashRateRequest, GetHashRateResponse](miningService.getHashRate, req)
     case req @ JsonRpcRequest(_, "eth_gasPrice", _, _) =>
       handle[GetGasPriceRequest, GetGasPriceResponse](ethService.getGetGasPrice, req)
     case req @ JsonRpcRequest(_, "eth_getTransactionByBlockNumberAndIndex", _, _) =>
@@ -98,15 +100,15 @@ class JsonRpcController(
         req
       )
     case req @ JsonRpcRequest(_, "eth_mining", _, _) =>
-      handle[GetMiningRequest, GetMiningResponse](ethService.getMining, req)
+      handle[GetMiningRequest, GetMiningResponse](miningService.getMining, req)
     case req @ JsonRpcRequest(_, "eth_getWork", _, _) =>
-      handle[GetWorkRequest, GetWorkResponse](ethService.getWork, req)
+      handle[GetWorkRequest, GetWorkResponse](miningService.getWork, req)
     case req @ JsonRpcRequest(_, "eth_submitWork", _, _) =>
-      handle[SubmitWorkRequest, SubmitWorkResponse](ethService.submitWork, req)
+      handle[SubmitWorkRequest, SubmitWorkResponse](miningService.submitWork, req)
     case req @ JsonRpcRequest(_, "eth_blockNumber", _, _) =>
       handle[BestBlockNumberRequest, BestBlockNumberResponse](ethService.bestBlockNumber, req)
     case req @ JsonRpcRequest(_, "eth_coinbase", _, _) =>
-      handle[GetCoinbaseRequest, GetCoinbaseResponse](ethService.getCoinbase, req)
+      handle[GetCoinbaseRequest, GetCoinbaseResponse](miningService.getCoinbase, req)
     case req @ JsonRpcRequest(_, "eth_getBlockTransactionCountByHash", _, _) =>
       handle[TxCountByBlockHashRequest, TxCountByBlockHashResponse](ethService.getBlockTransactionCountByHash, req)
     case req @ JsonRpcRequest(_, "eth_getBlockByHash", _, _) =>

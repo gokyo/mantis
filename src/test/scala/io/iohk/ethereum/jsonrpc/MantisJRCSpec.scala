@@ -24,6 +24,7 @@ class MantisJRCSpec extends FreeSpecBase with SpecFixtures with AsyncMockFactory
     val qaService = mock[QAService]
     val checkpointingService = mock[CheckpointingService]
     val mantisService = mock[MantisService]
+    val miningService = mock[EthMiningService]
 
     val jsonRpcController =
       new JsonRpcController(
@@ -36,6 +37,7 @@ class MantisJRCSpec extends FreeSpecBase with SpecFixtures with AsyncMockFactory
         qaService,
         checkpointingService,
         mantisService,
+        miningService,
         config
       )
 
