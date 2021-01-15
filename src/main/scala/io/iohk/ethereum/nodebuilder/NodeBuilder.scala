@@ -391,7 +391,7 @@ trait EthServiceBuilder {
   )
 }
 
-trait MiningServiceBuilder {
+trait EthMiningServiceBuilder {
   self: BlockchainBuilder
     with LedgerBuilder
     with JSONRpcConfigBuilder
@@ -400,7 +400,7 @@ trait MiningServiceBuilder {
     with PendingTransactionsManagerBuilder
     with TxPoolConfigBuilder =>
 
-  lazy val miningService = new EthMiningService(
+  lazy val ethMiningService = new EthMiningService(
     blockchain,
     ledger,
     jsonRpcConfig,
@@ -409,6 +409,12 @@ trait MiningServiceBuilder {
     pendingTransactionsManager,
     txPoolConfig.getTransactionFromPoolTimeout
   )
+}
+
+trait EthBlocksServiceBuilder {
+  self: BlockchainBuilder with BlockchainConfigBuilder with LedgerBuilder =>
+
+  lazy val ethBlocksService = new EthBlocksService(blockchain, ledger, blockchainConfig)
 }
 
 trait PersonalServiceBuilder {
@@ -491,7 +497,8 @@ trait JSONRpcConfigBuilder {
 trait JSONRpcControllerBuilder {
   this: Web3ServiceBuilder
     with EthServiceBuilder
-    with MiningServiceBuilder
+    with EthMiningServiceBuilder
+    with EthBlocksServiceBuilder
     with NetServiceBuilder
     with PersonalServiceBuilder
     with DebugServiceBuilder
@@ -509,20 +516,21 @@ trait JSONRpcControllerBuilder {
       web3Service,
       netService,
       ethService,
+      ethMiningService,
+      ethBlocksService,
       personalService,
       testService,
       debugService,
       qaService,
       checkpointingService,
       mantisService,
-      miningService,
       jsonRpcConfig
     )
 }
 
 trait JSONRpcHealthcheckerBuilder {
-  this: NetServiceBuilder with EthServiceBuilder =>
-  lazy val jsonRpcHealthChecker: JsonRpcHealthChecker = new NodeJsonRpcHealthChecker(netService, ethService)
+  this: NetServiceBuilder with EthBlocksServiceBuilder =>
+  lazy val jsonRpcHealthChecker: JsonRpcHealthChecker = new NodeJsonRpcHealthChecker(netService, ethBlocksService)
 }
 
 trait JSONRpcHttpServerBuilder {
@@ -685,7 +693,8 @@ trait Node
     with SyncControllerBuilder
     with Web3ServiceBuilder
     with EthServiceBuilder
-    with MiningServiceBuilder
+    with EthMiningServiceBuilder
+    with EthBlocksServiceBuilder
     with NetServiceBuilder
     with PersonalServiceBuilder
     with DebugServiceBuilder

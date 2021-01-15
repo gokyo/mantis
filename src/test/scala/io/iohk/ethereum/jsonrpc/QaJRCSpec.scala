@@ -244,9 +244,10 @@ class QaJRCSpec
     val personalService = mock[PersonalService]
     val debugService = mock[DebugService]
     val ethService = mock[EthService]
+    val ethMiningService = mock[EthMiningService]
+    val ethBlocksService = mock[EthBlocksService]
     val checkpointingService = mock[CheckpointingService]
     val mantisService = mock[MantisService]
-    val miningService = mock[EthMiningService]
     val qaService = mock[QAService]
 
     val jsonRpcController =
@@ -254,17 +255,18 @@ class QaJRCSpec
         web3Service,
         netService,
         ethService,
+        ethMiningService,
+        ethBlocksService,
         personalService,
         None,
         debugService,
         qaService,
         checkpointingService,
         mantisService,
-        miningService,
         config
       )
 
-    val mineBlocksReq = MineBlocksRequest(1, true, None)
+    val mineBlocksReq = MineBlocksRequest(1, withTransactions = true, None)
 
     val mineBlocksRpcRequest = JsonRpcRequest(
       "2.0",
